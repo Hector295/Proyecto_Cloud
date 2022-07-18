@@ -745,7 +745,7 @@ class UserInterface:
                                                             #print(slice)
                                                     print("Implementando .....")
                                                     sa.save_slice(slice)
-                                                    slice_nuevo = sa.create_slice(slice)
+                                                    slice_nuevo = sa.create_slice(slice,"1")
 
                                                     print("*************************************")
                                                     print(slice_nuevo)
@@ -765,7 +765,7 @@ class UserInterface:
                                                             slice["zona"] = {"nombre":zona_escogida}
                                                             #print(slice)
                                                     print("Implementando .....")
-                                                    slice_nuevo = sa.create_slice(slice)
+                                                    slice_nuevo = sa.create_slice(slice,"2")
                                                     print("*************************************")
                                                     print(slice_nuevo)
                                                     # slice["estado"] = "ejecutado"
@@ -777,7 +777,7 @@ class UserInterface:
 
                                     elif slice["estado"] == "ejecutado":
                                         print(f"* Actualizando el slice {slice['nombre']}")
-                                        slice_actualizado = sa.update_slice(slice)
+                                        slice_actualizado = sa.update_slice(slice,"1")
                                         sa.save_slice(slice_actualizado)
                                         print(slice_actualizado)
                                     print("------------------------")
@@ -797,11 +797,17 @@ class UserInterface:
                             break
                         else:
                             nombre_slice = ""
+                            tipo=""
                             for dic in lista:
                                 slice = dic.get(int(slice_escogido))
                                 if slice is not None:
                                     print(f"El slice que borrará es: {slice}")
                                     nombre_slice = slice
+                                    tipoTupla=Conexion().Select("tipo","slice",f"nombre='{nombre_slice}'")
+                                    if(tipoTupla[0][0]=="linux_custer"):
+                                        tipo="1"
+                                    if(tipoTupla[0][0]=="openstack"):
+                                        tipo="2"
                             confirma_borrado = o.def_borrar_menu3(slice_escogido)
                             if confirma_borrado == "exit":
                                 break
@@ -819,7 +825,7 @@ class UserInterface:
                                     json_slice = json.loads(data)
                                     f.close()
                                     sa= SliceAdministrator()
-                                    message = sa.delete_slice(json_slice)
+                                    message = sa.delete_slice(json_slice,tipo)
                                     print(message)
                                     print("***********************************")
                 elif option == 2:

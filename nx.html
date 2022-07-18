@@ -1,7 +1,7 @@
 <html>
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
 <center>
 <h1></h1>
 </center>
@@ -50,8 +50,8 @@
         
 
         // parsing and collecting nodes and edges from the python
-        nodes = new vis.DataSet([{"id": "n0", "label": "n0", "shape": "dot"}]);
-        edges = new vis.DataSet([]);
+        nodes = new vis.DataSet([{"id": "Mn11", "label": "Mn11", "shape": "dot"}, {"id": "Mn21", "label": "Mn21", "shape": "dot"}, {"id": "Mn12", "label": "Mn12", "shape": "dot"}, {"id": "Mn22", "label": "Mn22", "shape": "dot"}, {"id": "Mn13", "label": "Mn13", "shape": "dot"}, {"id": "Mn23", "label": "Mn23", "shape": "dot"}, {"id": "Mn31", "label": "Mn31", "shape": "dot"}, {"id": "Mn32", "label": "Mn32", "shape": "dot"}, {"id": "Mn33", "label": "Mn33", "shape": "dot"}]);
+        edges = new vis.DataSet([{"from": "Mn11", "to": "Mn21"}, {"from": "Mn11", "to": "Mn12"}, {"from": "Mn12", "to": "Mn22"}, {"from": "Mn12", "to": "Mn13"}, {"from": "Mn13", "to": "Mn23"}, {"from": "Mn21", "to": "Mn31"}, {"from": "Mn21", "to": "Mn22"}, {"from": "Mn22", "to": "Mn32"}, {"from": "Mn22", "to": "Mn23"}, {"from": "Mn23", "to": "Mn33"}, {"from": "Mn31", "to": "Mn32"}, {"from": "Mn32", "to": "Mn33"}]);
 
         // adding nodes and edges to the graph
         data = {nodes: nodes, edges: edges};
@@ -65,8 +65,8 @@
             "inherit": true
         },
         "smooth": {
-            "enabled": true,
-            "type": "dynamic"
+            "enabled": false,
+            "type": "continuous"
         }
     },
     "interaction": {

@@ -2,6 +2,7 @@ import secrets as s
 import requests
 from conf.Conexion import *
 from datetime import datetime
+import json
 import random
 TOKEN=""
 id_flavor_list=[]
@@ -103,8 +104,10 @@ def OpenStack_main(slice):
                 enlaces.append(vm_nombres[nodo["enlaces"][i]])
             imagen = nodo["config"]["imagen"]
             vm_worker_id = nodo["id_worker"]
-            if str(vm_worker_id) not in worker_list:
-                worker_list.append(str(vm_worker_id))
+
+            # if str(vm_worker_id) not in worker_list:
+            #     worker_list.append(str(vm_worker_id))
+            
             enlaces = ",".join(enlaces)
             data = {"vm_token": vm_nombre,
                     "vm_recursos": vm_recursos,
@@ -114,9 +117,9 @@ def OpenStack_main(slice):
                     "vnc_port": vnc_port,
                     "vm_worker_id" : vm_worker_id}
             #FIN EXTRA
-            servidor=conexion.Select('nombre','servidor',f'id_servidor={vm_worker_id}')
+            servidor=conn.Select('nombre','servidor',f'id_servidor={vm_worker_id}')
             nombre_servidor=servidor[0][0]
-            id_vm_creada=create_server(token, "vm-"+vm_nombre, id_flavor, network_id,nombre_servidor)
+            id_vm_creada=create_server(TOKEN, "vm-"+vm_nombre, id_flavor, network_id,nombre_servidor)
 
             if (id_vm_creada!=""):
                 nodo["instanciado"]="True"
@@ -199,7 +202,7 @@ def create_subnet(token, network_id,subnet_name, cidr):
         }
     }
     response = requests.post(f'http://10.20.12.54:9696/v2.0/subnets',json=d, headers=h)
-    print(f"CODE STATUS: {response.status_code}")
+    #print(f"CODE STATUS: {response.status_code}")
 
 def create_server(token, vm_name, flavor_id, network_id,compute):
     h = {"X-Auth-Token": token}
@@ -226,13 +229,19 @@ def create_server(token, vm_name, flavor_id, network_id,compute):
 
 
 def borrar_slice_openstack(slice):
-    print("-------OPENSTACK - BORRANDO SLICE ---------")
-    print(slice)
+    #print("-------OPENSTACK - BORRANDO SLICE ---------")
+    #print(slice)
+    conn= Conexion()
+    conn2=Conexion2()
+    id_s=conn.Select("id_slice","slice","nombre="+"'"+slice["nombre"]+"'")
+    vms=conn.Select("nombre,servidor_id_servidor","vm","topologia_id_topologia= "+str(id_s[0][0]))
+    i=0
     for nodo in list(slice["nodos"]):
-        nombre_vm= slice["mapeo_nombre"][nodo]
-        vm_worker_id = slice["nodos"][nodo]["id_worker"]
+        nombre_vm= vms[i][0]
+        #print(nombre_vm +" -> nombre de la vm a borrar openstack")
+        vm_worker_id = vms[i][1]
         nombre_nodo=nodo
-        conn2=Conexion2()
+        
         id_nodo_cluster=conn2.Select("id_nodo","nodo","nombre= "+"'"+nombre_vm+"'")
         taps=conn2.Select("nombre","enlace","nodo_id_nodo= "+id_nodo_cluster[0][0])
 
@@ -240,17 +249,19 @@ def borrar_slice_openstack(slice):
         delete_vms_id(TOKEN,id_vm)
 
         if (id_vm!=""):
-            conn= Conexion()
             id_nodo_general= conn.Select("id_vm","vm","nombre= "+"'"+nombre_vm+"'")
             id_recurso_general= conn.Select("recursos_id_estado","vm","nombre= "+"'"+nombre_vm+"'")
-            conn.Delete("recursos","id_recursos= "+id_recurso_general[0][0])
-            conn.Delete("vm","id_vm= "+id_nodo_general[0][0])
-            conn.Delete("slice", "nombre= "+"'"+slice["nombre"]+"'")
-            conn2.Delete("enlace","nodo_id_nodo= "+id_nodo_cluster[0][0])
-            conn2.Delete("vcpu","Nodo_id_nodo= "+id_nodo_cluster[0][0])
-            conn2.Delete("cpu","Nodo_id_nodo= "+id_nodo_cluster[0][0])
-            conn2.Delete("ram","Nodo_id_nodo= "+id_nodo_cluster[0][0])
-            conn2.Delete("nodo", "nombre= "+"'"+nombre_vm+"'")
+            conn.Delete("vm","id_vm= "+str(id_nodo_general[0][0]))
+            conn.Delete("recursos","id_recursos= "+str(id_recurso_general[0][0]))
+            
+            conn2.Delete("enlace","nodo_id_nodo= "+str(id_nodo_cluster[0][0]))
+            conn2.Delete("vcpu","Nodo_id_nodo= "+str(id_nodo_cluster[0][0]))
+            conn2.Delete("cpu","Nodo_id_nodo= "+str(id_nodo_cluster[0][0]))
+            conn2.Delete("ram","Nodo_id_nodo= "+str(id_nodo_cluster[0][0]))
+            
+        i=i+1
+    conn.Delete("slice", "nombre= "+"'"+slice["nombre"]+"'")
+    conn2.Delete("nodo", "nombre= "+"'"+nombre_vm+"'")
 
 def get_vms_id(token,nombre):
     h = {"X-Auth-Token": token, "X-OpenStack-Nova-API-Version": "2.47"}
@@ -267,14 +278,15 @@ def delete_vms_id(token,id_vm):
 
 
 def info_computes():
-    h = {"X-Auth-Token": token, "X-OpenStack-Nova-API-Version": "2.47"}
+    h = {"X-Auth-Token": TOKEN, "X-OpenStack-Nova-API-Version": "2.47"}
     rp=requests.get(f'http://10.20.12.54:8774/v2.1/os-hypervisors/detail', headers=h)
     #valores en bytes
+    #print(rp.json())
     mega=1048576
     gb=1073741824
     valor='['
     for hy in rp.json()["hypervisors"]:
-        print(hy["hypervisor_hostname"]+"----freeram "+str(hy["free_ram_mb"])+" vcpufree"+str(hy["vcpus"]-hy["vcpus_used"])+"free_disk_gb "+str(hy["free_disk_gb"]))
+        #print(hy["hypervisor_hostname"]+"----freeram "+str(hy["free_ram_mb"])+" vcpufree"+str(hy["vcpus"]-hy["vcpus_used"])+"free_disk_gb "+str(hy["free_disk_gb"]))
         ram=str(mega*hy["free_ram_mb"])
         ramT=str(mega*hy["memory_mb"])
         storage=str(gb*hy["free_disk_gb"])
@@ -299,5 +311,8 @@ def guardarRecursos(nombre,cpu, ram, storage, ramUtil,storageU, vcpu,vcpuUtil):
         #valor=conexion.Select('vcpu_available','recursos',f'id_recursos={id_recurso_encontrado}')
     else:
         id_recurso=conexion.Insert('recursos','cpu,ram,storage,ram_available,storage_available,vcpu,vcpu_available',f'{cpu},{ram},{storage},{ramUtil},{storageU},{vcpu},{vcpuUtil}')
-        conexion.Insert('servidor','nombre,descripcion,fecha_creacion,grupo_hardware,id_zona,id_recurso,fecha_modificacion',f'"{nombre}","Es un compute de OpenStack","{fecha_actual}","openstack",{1},{id_recurso},"{fecha_actual}"')
+        conexion.Insert('servidor','nombre,descripcion,fecha_creacion,ip,id_zona,id_recurso,fecha_modificacion',f'"{nombre}","openstack","{fecha_actual}","openstack",{1},{id_recurso},"{fecha_actual}"')
         #valor='-1'
+# response=get_token()
+# TOKEN = response.headers["X-Subject-Token"]
+# info_computes()
