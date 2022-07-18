@@ -84,7 +84,17 @@ def OpenStack_main(slice):
     nombre_flavor=1
     for nodo_key in slice["nodos"]:
         nodo = slice["nodos"][nodo_key]
-        id_imagen= conn.Select("id_imagen","imagen","nombre="+"'"+nodo["config"]["imagen"]["nombre"]+"'"+"limit 1")
+        if ((nodo["config"]["imagen"]["url"])=="-"):
+            id_i= conn.Select("id_imagen","imagen","nombre="+"'"+nodo["config"]["imagen"]["nombre"]+"'"+"limit 1")
+            id_imagen=id_i[0][0]
+        else:
+            imagen_nombre=nodo["config"]["imagen"]["nombre"]
+            id_i= conn.Select("id_imagen","imagen","nombre="+"'"+nodo["config"]["imagen"]["nombre"]+"'"+"limit 1")
+            
+            if (len(id_i)==0):
+                id_imagen=conn.Insert("imagen", "nombre,fecha_creacion", f"'{imagen_nombre}',now()")
+            else:
+                id_imagen=id_i[0][0]
         if(nodo["instanciado"]=="false"):
             vm_nombre = vm_nombres[nodo_key]
             if nodo["config"]["type"] == "manual":
@@ -205,7 +215,7 @@ def create_subnet(token, network_id,subnet_name, cidr):
     #print(f"CODE STATUS: {response.status_code}")
 
 def create_server(token, vm_name, flavor_id, network_id,compute):
-    h = {"X-Auth-Token": token}
+    h = {"X-Auth-Token": token,"X-OpenStack-Nova-API-Version": "2.74"}
     d = {
             "server" : {
                     "name" : vm_name,
@@ -220,11 +230,12 @@ def create_server(token, vm_name, flavor_id, network_id,compute):
                             "name": "default"
                         }
                     ],
-                   "hypervisor_hostname": compute 
+                    "hypervisor_hostname": compute
                 }
         }
 
     response = requests.post(f'http://10.20.12.54:8774/v2.1/servers',json=d, headers=h)
+    #print(response.json())
     return response.json()["server"]["id"]
 
 
@@ -233,6 +244,7 @@ def borrar_slice_openstack(slice):
     #print(slice)
     conn= Conexion()
     conn2=Conexion2()
+    nombre_slice=slice["nombre"]
     id_s=conn.Select("id_slice","slice","nombre="+"'"+slice["nombre"]+"'")
     vms=conn.Select("nombre,servidor_id_servidor","vm","topologia_id_topologia= "+str(id_s[0][0]))
     i=0
@@ -243,7 +255,7 @@ def borrar_slice_openstack(slice):
         nombre_nodo=nodo
         
         id_nodo_cluster=conn2.Select("id_nodo","nodo","nombre= "+"'"+nombre_vm+"'")
-        taps=conn2.Select("nombre","enlace","nodo_id_nodo= "+id_nodo_cluster[0][0])
+        #taps=conn2.Select("nombre","enlace","nodo_id_nodo= "+id_nodo_cluster[0][0])
 
         id_vm=get_vms_id(TOKEN,nombre_vm)
         delete_vms_id(TOKEN,id_vm)
@@ -262,22 +274,30 @@ def borrar_slice_openstack(slice):
         i=i+1
     conn.Delete("slice", "nombre= "+"'"+slice["nombre"]+"'")
     conn2.Delete("nodo", "nombre= "+"'"+nombre_vm+"'")
+    print("Slice "+nombre_slice+" BORRADO EXITOSAMENTE!")
 
 def get_vms_id(token,nombre):
-    h = {"X-Auth-Token": token, "X-OpenStack-Nova-API-Version": "2.47"}
+    response=get_token()
+    TOKEN = response.headers["X-Subject-Token"]
+    h = {"X-Auth-Token": TOKEN, "X-OpenStack-Nova-API-Version": "2.47"}
     response = requests.get(f'http://10.20.12.54:8774/v2.1/servers/detail', headers=h)
     vm_id="-1"
+    #print(response.json())
     for vm in response.json()["servers"]:
         if(vm["name"]==nombre):
             vm_id = vm["id"]
     return vm_id
 
 def delete_vms_id(token,id_vm):
-    h = {"X-Auth-Token": token, "X-OpenStack-Nova-API-Version": "2.47"}
+    response=get_token()
+    TOKEN = response.headers["X-Subject-Token"]
+    h = {"X-Auth-Token": TOKEN, "X-OpenStack-Nova-API-Version": "2.47"}
     response = requests.delete(f'http://10.20.12.54:8774/v2.1/servers/{id_vm}', headers=h)
 
 
 def info_computes():
+    response=get_token()
+    TOKEN = response.headers["X-Subject-Token"]
     h = {"X-Auth-Token": TOKEN, "X-OpenStack-Nova-API-Version": "2.47"}
     rp=requests.get(f'http://10.20.12.54:8774/v2.1/os-hypervisors/detail', headers=h)
     #valores en bytes

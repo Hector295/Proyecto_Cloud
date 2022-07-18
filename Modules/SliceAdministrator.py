@@ -15,6 +15,8 @@ class SliceAdministrator:
         FACTOR = 2
         slice, result = scheduler_main(grafo, FACTOR)
         if result:
+            print("-----------------")
+            print(slice)
             if(tipo=="1"):
                 nuevo_slice = linux_driver_main(slice)
             if(tipo=="2"):

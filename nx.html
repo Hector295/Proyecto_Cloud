@@ -50,13 +50,8 @@
         
 
         // parsing and collecting nodes and edges from the python
-<<<<<<< HEAD
-        nodes = new vis.DataSet([{"id": "Mn11", "label": "Mn11", "shape": "dot"}, {"id": "Mn21", "label": "Mn21", "shape": "dot"}, {"id": "Mn12", "label": "Mn12", "shape": "dot"}, {"id": "Mn22", "label": "Mn22", "shape": "dot"}, {"id": "Mn13", "label": "Mn13", "shape": "dot"}, {"id": "Mn23", "label": "Mn23", "shape": "dot"}, {"id": "Mn31", "label": "Mn31", "shape": "dot"}, {"id": "Mn32", "label": "Mn32", "shape": "dot"}, {"id": "Mn33", "label": "Mn33", "shape": "dot"}]);
-        edges = new vis.DataSet([{"from": "Mn11", "to": "Mn21"}, {"from": "Mn11", "to": "Mn12"}, {"from": "Mn12", "to": "Mn22"}, {"from": "Mn12", "to": "Mn13"}, {"from": "Mn13", "to": "Mn23"}, {"from": "Mn21", "to": "Mn31"}, {"from": "Mn21", "to": "Mn22"}, {"from": "Mn22", "to": "Mn32"}, {"from": "Mn22", "to": "Mn23"}, {"from": "Mn23", "to": "Mn33"}, {"from": "Mn31", "to": "Mn32"}, {"from": "Mn32", "to": "Mn33"}]);
-=======
-        nodes = new vis.DataSet([{"id": "Mn11", "label": "Mn11", "shape": "dot"}, {"id": "Mn21", "label": "Mn21", "shape": "dot"}, {"id": "Mn12", "label": "Mn12", "shape": "dot"}, {"id": "Mn22", "label": "Mn22", "shape": "dot"}]);
-        edges = new vis.DataSet([{"from": "Mn11", "to": "Mn21"}, {"from": "Mn11", "to": "Mn12"}, {"from": "Mn12", "to": "Mn22"}, {"from": "Mn21", "to": "Mn22"}]);
->>>>>>> 24e4ce51341fcf1b80c411de21220110b1bb46a3
+        nodes = new vis.DataSet([{"id": "n5", "label": "n5", "shape": "dot"}, {"id": "n1", "label": "n1", "shape": "dot"}, {"id": "n2", "label": "n2", "shape": "dot"}, {"id": "n3", "label": "n3", "shape": "dot"}, {"id": "n4", "label": "n4", "shape": "dot"}]);
+        edges = new vis.DataSet([{"from": "n5", "to": "n1"}, {"from": "n1", "to": "n2"}, {"from": "n1", "to": "n3"}, {"from": "n1", "to": "n4"}]);
 
         // adding nodes and edges to the graph
         data = {nodes: nodes, edges: edges};

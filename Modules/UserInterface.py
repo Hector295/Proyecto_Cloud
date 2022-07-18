@@ -1,6 +1,7 @@
 from Modules.SliceAdministrator import SliceAdministrator
 from Topology import *
 from Modules.UserInterface import *
+from Modules.OpenStackDriver import *
 import json
 import os
 from conf.Conexion import *
@@ -186,7 +187,7 @@ class UserInterface:
         lista = []
         for nombre in slices:
             i = i + 1
-            print(f"{i}. Zona: {nombre[0]}")
+            print(f"{i}. Slice: {nombre[0]}")
             dic = {i: nombre[0]}
             lista.append(dic)
         print("Escriba 'exit' para salir del menú")
@@ -756,11 +757,13 @@ class UserInterface:
                                                     print("*************************************")
                                                     print(slice_nuevo)
                                                     # slice["estado"] = "ejecutado"
+                                                    print("Slice "+slice_nuevo["nombre"]+" IMPLEMENTADO EXITOSAMENTE!")
                                                     print("*************************************")
                                                 else:
                                                     print("No hay zonas de disponibilidad")
                                             elif int(tipo) == 2:
                                                 tipo_zona = "openstack"
+                                                info_computes()
                                                 lista = o.listar_zonas(tipo_zona)
                                                 if len(lista) > 0:
                                                     zona = input("Escoja la zona:")
@@ -775,6 +778,7 @@ class UserInterface:
                                                     print("*************************************")
                                                     print(slice_nuevo)
                                                     # slice["estado"] = "ejecutado"
+                                                    print("Slice "+slice_nuevo["nombre"]+" IMPLEMENTADO EXITOSAMENTE!")
                                                     print("*************************************")
                                                 else:
                                                     print("No hay zonas de disponibilidad")
