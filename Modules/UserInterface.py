@@ -124,7 +124,7 @@ class UserInterface:
         lista=[]
         for nombre in slices:
             i=i+1
-            print(f"{i}. Zona: {nombre[0]}")
+            print(f"{i}. Slice: {nombre[0]}")
             dic = {i: nombre[0]}
             lista.append(dic)
         print("Escriba 'exit' para salir del menú")
@@ -136,14 +136,16 @@ class UserInterface:
         conn = Conexion()
         id=conn.Select("id_slice","slice",f"nombre='{slice}'")
         id=id[0]
-        info_vm = conn.Select("nombre,recursos_id_estado,vnc","vm",f"topologia_id_topologia='{id[0]}'")
+        info_vm = conn.Select("nombre,recursos_id_estado,vnc,servidor_id_servidor","vm",f"topologia_id_topologia='{id[0]}'")
         for vm in info_vm:
             #print(f"Nombre VM: {info_vm[0]}")
             recursos = conn.Select("ram,vcpu,storage","recursos",f"id_recursos={vm[1]}")
+            ip = conn.Select("ip","servidor",f"id_Servidor='{vm[3]}'")
+            ip=ip[0]
             ram = int(recursos[0][0]) #/ 1000000
             disco = int(recursos[0][2]) #/ 1000000
             vnc_port=5900+vm[2]
-            print(f"VM: {vm[0]} - Capacidad: RAM:{str(ram)} MB CPU:{recursos[0][1]} DISCO:{str(disco)} GB - VNC_PORT: {vnc_port}")
+            print(f"VM: {vm[0]} - Capacidad: RAM:{str(ram)} MB CPU:{recursos[0][1]} DISCO:{str(disco)} GB - ACCESO_VNC: {ip[0]}:{vnc_port}")
 
     @staticmethod
     def def_listar_menu2(zona):
@@ -566,10 +568,11 @@ class UserInterface:
                                                 print("* Puede importar una imagen desde: https://docs.google.com/document/d/1htiLHrXIsEkm9U_b201QaSHzYYCZjQHyMa2cDii7QSE/edit?usp=sharing)")
                                                 link = input("Ingrese un link:")
                                                 nombre = input("Ingrese el nombre:")
+                                                imagen2=nombre
                                                 info_config = {"nombre": nombre, "url": link}
                                                 for nodo in nodos:
                                                     slice["nodos"][nodo]["config"]["imagen"] = info_config
-                                                imagen = f"desde {link}"
+                                                imagen2 = imagen2+f" desde {link}"
                                             print(f"Se configuró los siguientes nodos {nodos} con flavor: {flavor2[0]} e imagen: {imagen2}")
 
                                         elif int(conf_nodos_mode2) == 2:
@@ -604,10 +607,11 @@ class UserInterface:
                                                     "* Puede importar una imagen desde: https://docs.google.com/document/d/1htiLHrXIsEkm9U_b201QaSHzYYCZjQHyMa2cDii7QSE/edit?usp=sharing)")
                                                 link = input("Ingrese un link:")
                                                 nombre = input("Ingrese un nombre:")
+                                                imagen2=nombre
                                                 info_config = {"nombre":nombre,"url":link}
                                                 for nodo in nodos:
                                                     slice["nodos"][nodo]["config"]["imagen"] = info_config
-                                                imagen = f"desde {link}"
+                                                imagen2 = imagen2+f" desde {link}"
                                             print(f"Se configuró los siguientes nodos {nodos} con:")
                                             print(f"RAM: {ram} , CPU: {cpu}, DISCO: {disco} e imagen: {imagen2}")
                                         else:
@@ -666,10 +670,11 @@ class UserInterface:
                                                         "* Puede importar una imagen desde: https://docs.google.com/document/d/1htiLHrXIsEkm9U_b201QaSHzYYCZjQHyMa2cDii7QSE/edit?usp=sharing)")
                                                     link = input("Ingrese un link:")
                                                     nombre = input("Ingrese un nombre:")
-                                                    info_config={"nombre": imagen, "url": "-"}
+                                                    imagen2=nombre
+                                                    info_config={"nombre": nombre, "url": "-"}
                                                     for nodo in nodos:
                                                         slice["nodos"][nodo]["config"]["imagen"] = info_config
-                                                    imagen = f"desde {link}"
+                                                    imagen2 = imagen2+ f" desde {link}"
                                                 print(f"Se configuró los siguientes nodos {nodos} con flavor: {flavor2[0]} e imagen: {imagen2}")
                                             elif int(conf_nodos_mode2) == 2:
                                                 cpu = input("Indicar el # de CPUs:")
@@ -702,10 +707,11 @@ class UserInterface:
                                                     print("* Puede importar una imagen desde: https://docs.google.com/document/d/1htiLHrXIsEkm9U_b201QaSHzYYCZjQHyMa2cDii7QSE/edit?usp=sharing)")
                                                     link = input("Ingrese un link:")
                                                     nombre = input("Ingrese un nombre:")
+                                                    imagen2=nombre
                                                     info_config={"nombre":nombre,"url":link}
                                                     for nodo in nodos:
                                                         slice["nodos"][nodo]["config"]["imagen"] = info_config
-                                                    imagen = f"desde {link}"
+                                                    imagen2 = imagen2 + f" desde {link}"
                                                 print(f"Se configuró los siguientes nodos {nodos} con:")
                                                 print(f"RAM: {ram} , CPU: {cpu}, DISCO: {disco} e imagen: {imagen2}")
                                             else:
@@ -714,7 +720,7 @@ class UserInterface:
                                     slice["ultimo_nodo"] = prox_node-1
                                     print("------Data a enviar-----")
                                     print(slice)
-                                    slice["estado"] = "guardado"
+                                    #slice["estado"] = "guardado"
                                     if slice["estado"] == "guardado":
                                         print("*************************************")
                                         print("1. Guardar como borrardor")
