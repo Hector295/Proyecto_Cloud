@@ -1,1 +1,32 @@
-{"nodos": {"n5": {"enlaces": ["n1"], "instanciado": "false", "config": {"type": "flavor", "info_config": "m1.tiny", "imagen": {"nombre": "", "url": "-"}}}, "n1": {"enlaces": ["n2", "n3", "n4", "n5"], "instanciado": "false", "config": {"type": "flavor", "info_config": "m1.tiny", "imagen": {"nombre": "", "url": "-"}}}, "n2": {"enlaces": ["n1"], "instanciado": "false", "config": {"type": "flavor", "info_config": "m1.tiny", "imagen": {"nombre": "", "url": "-"}}}, "n3": {"enlaces": ["n1"], "instanciado": "false", "config": {"type": "flavor", "info_config": "m1.tiny", "imagen": {"nombre": "", "url": "-"}}}, "n4": {"enlaces": ["n1"], "instanciado": "false", "config": {"type": "flavor", "info_config": "m1.tiny", "imagen": {"nombre": "", "url": "-"}}}}, "nombre": "Slice_OpenStack", "estado": "guardado", "ultimo_nodo": 5}
+{
+    "nodos": {
+     "n5": {
+      "enlaces": ["n1"],
+      "instanciado": "false",
+      "config": {"type": "flavor","info_config": "m1.tiny","imagen": {"nombre": "","url": "-"}}
+     },
+     "n1": {
+      "enlaces": ["n2","n3","n4","n5"],
+      "instanciado": "false",
+      "config": {"type": "flavor","info_config": "m1.tiny","imagen": {"nombre": "","url": "-"}}
+     },
+     "n2": {
+      "enlaces": ["n1"],
+      "instanciado": "false",
+      "config": {"type": "flavor","info_config": "m1.tiny","imagen": {"nombre": "","url": "-"}}
+     },
+     "n3": {
+      "enlaces": ["n1"],
+      "instanciado": "false",
+      "config": {"type": "flavor","info_config": "m1.tiny","imagen": {"nombre": "","url": "-"}}
+     },
+     "n4": {
+      "enlaces": ["n1"],
+      "instanciado": "false",
+      "config": {"type": "flavor","info_config": "m1.tiny","imagen": {"nombre": "","url": "-"}}
+     }
+    },
+    "nombre": "Slice_OpenStack",
+    "estado": "guardado",
+    "ultimo_nodo": 5
+   }
